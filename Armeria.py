@@ -5,7 +5,7 @@ class Aefede(object):
         self.alfabeto = []        
         self.eAceptacion = []
         self.transiciones = []
-        self.tipo = "AFD"
+    
     #getters
     def getName(self):
         return str(self.nombre)
@@ -19,8 +19,7 @@ class Aefede(object):
         return self.eAceptacion
     def getTransiciones(self):
         return self.transiciones
-    def getTipo(self):
-        return str(self.tipo)
+
     #setters
     def setName(self, valor):
         self.nombre = valor
@@ -79,7 +78,7 @@ class Gramatica(object):
         self.noTerms = []
         self.terminales = []        
         self.producciones = []
-        self.tipo = "Gramatica"        
+        self.tipo3 = False
     
     #getters
     def getName(self):
@@ -87,61 +86,38 @@ class Gramatica(object):
     def getNoTerms(self):
         return self.noTerms
     def getTerminales(self):
-        return self.terminales
-    def getNTinicial(self):
-        return self.NTinicial
-    def getProducciones (self):
+        return self.terminales    
+    def getProducciones(self):
         return self.producciones
-    def getTipo(self):
-        return str(self.tipo)    
+    def getTipo3(self):
+        return self.tipo3
     
-    #setters
-    def setName(self, valor):
-        self.nombre= valor
-    def setNTinicial(self, valor):
-        self.NTinicial = valor
-    def setIzquierda(self,valor):
-        self.izquierda=valor    
+    #setters    
     def setTerminales(self,valor):
         self.terminales=valor
+    def setTipo3(self,valor):
+        self.tipo3 = valor
 
 class noTerminal(object):
     def __init__(self, nombre):
-        self.name = nombre
-        self.epsilon = False
-        self.inicio = False
-        self.salidas = []
-        self.alto = False
+        self.name = nombre        
+        self.inicio = False        
+        
     #getters
     def getName(self):
-        return str(self.name)
-    def getEpsilon(self):
-        return self.epsilon
+        return str(self.name)    
     def getInicio(self):
         return self.inicio
-    def getSalidas(self):
-        return self.salidas
-    def getAlto(self):
-        return self.alto
-
-    def setSalidas(self,valor):
-        self.salidas=valor
+    
     def setInicio(self, valor):
-        self.inicio=valor
-    def setEpsilon(self, valor):
-        self.epsilon=valor
-    def setAlto(self,valor):
-        self.alto = valor
+        self.inicio=valor      
 
 class Produccion (object):
-    def __init__(self, inicial, final, termi):
-        self.tInicial = inicial
-        self.tFinal = final
-        self.terminal = termi
+    def __init__(self, inicial,derivar):
+        self.tInicial = inicial        
+        self.derivacion = derivar
     #getters
     def gettInicial(self):
         return self.tInicial
-    def gettFinal(self):
-        return self.tFinal
-    def getTerminal(self):
-        return self.terminal
+    def getDerivacion(self):
+        return self.derivacion
