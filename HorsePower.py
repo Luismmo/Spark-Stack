@@ -6,11 +6,12 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 import subprocess
 import time
+from graphviz import Digraph
 
 class SparkStack(object):
     def __init__(self):
         self.automatas = []
-        self.gramaticas = []
+        self.gramaticas = []                
     
     def clrscr(self):
         os.system("cls")
@@ -78,7 +79,7 @@ class SparkStack(object):
                 self.MostrarInformacion()
                 time.sleep(1)
             elif opcion == 3:
-                print("sacando arbol")
+                self.generarArbol()
                 time.sleep(1)
             elif opcion == 4:
                 print("generando equivalente")
@@ -222,24 +223,24 @@ class SparkStack(object):
                     if name == self.gramaticas[q].getName():
                         esTipo3 = self.gramaticas[q].getTipo3()
                         if esTipo3 == True:
-                            print("Gramatica agregada con exito.")
-                            time.sleep(2)
+                            print("Gramatica agregada con éxito.\n")
+                            #time.sleep(2)
                         else:
                             self.gramaticas.pop(q)
-                            print("Iteracion "+str(q+1)+" es gramatica regular. SE DESCARTA.")
-                            time.sleep(2)
+                            print("Es gramatica regular. SE DESCARTA.\n")
+                            #time.sleep(2)
             else: #se repite
                 print("Aviso: Se encontró una gramatica con el mismo nombre en memoria, la accion no se puede completar.")
                 time.sleep(2)
 
-    def listarGramaticas(self):
-        print("****** Mostrar información ******")
+    def listarGramaticas(self):        
         for a in range(len(self.gramaticas)):
             print("-> "+self.gramaticas[a].getName())
         print(" ")
 
     def MostrarInformacion(self):
         self.clrscr()
+        print("****** Mostrar información ******")
         self.listarGramaticas()
         eleccion = str(input("Ingrese el nombre de la gramatica: "))
         print(" ")
@@ -270,7 +271,69 @@ class SparkStack(object):
                             print(self.gramaticas[a].getProducciones()[i].gettInicial()+">"+self.gramaticas[a].getProducciones()[i].getDerivacion())
                             anterior=self.gramaticas[a].getProducciones()[i].gettInicial()
         input("\nPRESIONE ENTER PARA FINALIZAR EL REPORTE.")
+    
+    def generarArbol(self):
+        contador = 0
+        ancla = 0
+        ancla2 = 0
+        conexiones = []
+        controles = []
+        self.clrscr()
+        print("****** Árbol de derivación ******")
+        self.listarGramaticas()
+        name = str(input("Ingrese el nombre de la gramatica: "))
+        for i in range(len(self.gramaticas)):
+            if name == self.gramaticas[i].getName():
+                f = Digraph(filename = self.gramaticas[i].getName(), format='png', encoding='UTF-8')
+                f.attr(rankdir = 'TB')
+                f.attr('node', shape='none')
+                
+                f.edge_attr.update(arrowhead = "none")
+                for a in range(len(self.gramaticas[i].getProducciones())):                    
+                        if a == 0:                            
+                            #creo el nodo de la terminal del inicio de la produccion
+                            nodo = self.gramaticas[i].getProducciones()[a].gettInicial()
+                            f.node(str(contador),nodo)
+                            #guardo el id que corresponde al nodo
+                            ancla=contador                        
+                            contador+=1
+                            #creo los otros nodos que corresponden a la derivacion del terminal inicial
+                            derivacion = self.gramaticas[i].getProducciones()[a].getDerivacion().split(' ')
+                            for k in range(len(derivacion)):
+                                nodo = derivacion[k]
+                                f.node(str(contador),nodo)
+                                edge = Conexion(ancla,contador)
+                                conexiones.append(edge)
+                                for t in range(len(self.gramaticas[i].getNoTerms())):
+                                    if nodo == self.gramaticas[i].getNoTerms()[t].getName():
+                                        control = Control(contador,nodo)
+                                        controles.append(control)
+                                contador+=1
+                            self.gramaticas[i].getProducciones()[a].setYapaso(True)
+                        else:
+                            for s in range(len(self.gramaticas[i].getProducciones())):
+                                for c in range(len(controles)):
+                                    if controles[c].getNodo() == self.gramaticas[i].getProducciones()[s].gettInicial() and self.gramaticas[i].getProducciones()[s].getYapaso()==False:
+                                        derivaciones = self.gramaticas[i].getProducciones()[s].getDerivacion().split(' ')
+                                        input(derivaciones)
+                                        for x in range(len(derivaciones)):
+                                            nodo = derivaciones[x]
+                                            f.node(str(contador),nodo)
+                                            edge = Conexion(controles[c].getAncla(),contador)
+                                            conexiones.append(edge)
+                                            for b in range(len(self.gramaticas[i].getNoTerms())):
+                                                if nodo  == self.gramaticas[i].getNoTerms()[b].getName():
+                                                    control = Control(contador,nodo)
+                                                    controles.append(control)
+                                            contador+=1
+                                        self.gramaticas[i].getProducciones()[s].setYapaso(True)
+                                                                                           
+                for q in range(len(conexiones)):
+                    f.edge(conexiones[q].getInicio(),conexiones[q].getSiguiente())
+                            
+                f.view()
 
+        #f.node('nombre', label=)
 
     #*********************************************
     #de aqui en adelante viene lo de los automatas 

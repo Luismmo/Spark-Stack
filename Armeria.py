@@ -30,17 +30,23 @@ class Aefede(object):
 
 
 class Transicion(object):
-    def __init__(self, inicial, final, entra):
+    def __init__(self, inicial, final, leer, sacar, guardar):
         self.eInicial = inicial
         self.eFinal = final
-        self.entrada = entra 
+        self.leer = leer
+        self.sacar = sacar
+        self.guardar = guardar
     #getters
     def geteInicial(self):
         return self.eInicial
     def geteFinal(self):
         return self.eFinal
-    def getEntrada(self):
-        return str(self.entrada)  
+    def getLeer(self):
+        return str(self.leer)  
+    def getSacar(self):
+        return str(self.sacar)
+    def getGuardar(self):
+        return str(self.guardar)
 
 class Estado(object):
     def __init__(self, nombre):
@@ -116,8 +122,37 @@ class Produccion (object):
     def __init__(self, inicial,derivar):
         self.tInicial = inicial        
         self.derivacion = derivar
+        self.yapaso = False
     #getters
     def gettInicial(self):
         return self.tInicial
     def getDerivacion(self):
         return self.derivacion
+    def getYapaso(self):
+        return self.yapaso
+    #setters
+    def setYapaso(self, valor):
+        self.yapaso = valor
+
+class Conexion(object):
+    def __init__(self,inicio, siguiente):
+        self.inicio = inicio
+        self.siguiente = siguiente
+
+    #getters
+    def getInicio(self):
+        return str(self.inicio)
+    def getSiguiente(self):
+        return str(self.siguiente)
+
+class Control(object):
+    def __init__(self,ancla, nodo):
+        self.ancla = ancla
+        self.nodo = nodo
+
+    #getters
+    def getAncla(self):
+        return str(self.ancla)
+    def getNodo(self):
+        return str(self.nodo)
+        
