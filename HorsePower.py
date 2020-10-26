@@ -77,12 +77,12 @@ class SparkStack(object):
                 time.sleep(1)
             elif opcion == 2:
                 self.MostrarInformacion()
-                time.sleep(1)
+                #time.sleep(1)
             elif opcion == 3:
                 self.generarArbol()
-                time.sleep(1)
+                #time.sleep(1)
             elif opcion == 4:
-                print("generando equivalente")
+                self.automataEquivalente()
                 time.sleep(1)
             elif opcion == 5:
                 salida2 = False
@@ -373,8 +373,47 @@ class SparkStack(object):
                             
                 f.view()
 
-        #f.node('nombre', label=)
-
+    def automataEquivalente(self):
+        self.clrscr()
+        print("****** Automata de pila equivalente ******")
+        self.listarGramaticas()
+        name = str(input("Ingrese el nombre de la gramatica: "))
+        for i in range(len(self.gramaticas)):
+            if name == self.gramaticas[i].getName():
+                f = Digraph(filename = self.gramaticas[i].getName(), format='pdf', encoding='UTF-8')
+                f.attr(rankdir = 'LR')
+                f.attr('node', shape='none')
+                f.node("0","")
+                f.attr('node', shape='circle')
+                f.node("1","i")
+                f.node("2","p")
+                f.node("3","q")
+                f.attr('node', shape='doublecircle')
+                f.node("4","f")
+                f.attr(fontsize='20')
+                f.attr(label= r"Nombre: "+str(self.gramaticas[i].getName()))
+                f.attr(fontsize='12')
+                alfabeto = "Alfabeto: "+str(self.gramaticas[i].getTerminales())
+                f.attr(label=alfabeto)
+                lista = []
+                lista +=self.gramaticas[i].getTerminales()
+                lista.extend(self.gramaticas[i].getNoTerms())
+                aPila = "Alfabeto de pila: "+str(lista)
+                f.attr(label=aPila)                
+                f.attr(label="Estados: [i, p, q, f]")
+                f.attr(label="Estado inicial: [i]")
+                f.attr(label="Estado de aceptación: [f]")
+                f.edge('0','1')
+                f.edge('1','2', label='$,$;#')
+                f.edge('2','3', label='$,$;S')
+                transiciones = ""
+                for a in range(len(self.gramaticas[i].getTerminales())):
+                    transiciones+=self.gramaticas[i].getTerminales()[a]+","+self.gramaticas[i].getTerminales()[a]+";$\n"
+                for k in range(len(self.gramaticas[i].getProducciones())):
+                    transiciones+="$,"+self.gramaticas[i].getProducciones()[k].gettInicial()+";"+self.gramaticas[i].getProducciones()[k].getDerivacion()+"\n"
+                f.edge('3','3',label=transiciones)
+                f.edge('3','4',label='$,#;$')
+                f.view()
     #*********************************************
     #de aqui en adelante viene lo de los automatas 
     def ModuloAutomatas(self):
