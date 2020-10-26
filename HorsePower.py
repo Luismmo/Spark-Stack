@@ -276,6 +276,7 @@ class SparkStack(object):
         contador = 0
         ancla = 0
         ancla2 = 0
+        mismoNodo = ""
         conexiones = []
         controles = []
         self.clrscr()
@@ -302,10 +303,13 @@ class SparkStack(object):
                             for k in range(len(derivacion)):
                                 nodo = derivacion[k]
                                 f.node(str(contador),nodo)
+                                #uno el nodo raiz con su produccion.
                                 edge = Conexion(ancla,contador)
                                 conexiones.append(edge)
+                                #valido si lo que viene en su derivación es un No terminal que tiene mas derivaciones
                                 for t in range(len(self.gramaticas[i].getNoTerms())):
                                     if nodo == self.gramaticas[i].getNoTerms()[t].getName():
+                                        #si encuentro un no terminal creo un objeto que lleva el control de su id para las conexiones
                                         control = Control(contador,nodo)
                                         controles.append(control)
                                 contador+=1
@@ -314,19 +318,55 @@ class SparkStack(object):
                             for s in range(len(self.gramaticas[i].getProducciones())):
                                 for c in range(len(controles)):
                                     if controles[c].getNodo() == self.gramaticas[i].getProducciones()[s].gettInicial() and self.gramaticas[i].getProducciones()[s].getYapaso()==False:
-                                        derivaciones = self.gramaticas[i].getProducciones()[s].getDerivacion().split(' ')
-                                        input(derivaciones)
-                                        for x in range(len(derivaciones)):
-                                            nodo = derivaciones[x]
-                                            f.node(str(contador),nodo)
-                                            edge = Conexion(controles[c].getAncla(),contador)
-                                            conexiones.append(edge)
-                                            for b in range(len(self.gramaticas[i].getNoTerms())):
-                                                if nodo  == self.gramaticas[i].getNoTerms()[b].getName():
-                                                    control = Control(contador,nodo)
-                                                    controles.append(control)
-                                            contador+=1
-                                        self.gramaticas[i].getProducciones()[s].setYapaso(True)
+                                        #codigo nuevo 
+                                        if mismoNodo!=self.gramaticas[i].getProducciones()[s].gettInicial():
+                                        #fin codigo nuevo                                            
+                                            derivaciones = self.gramaticas[i].getProducciones()[s].getDerivacion().split(' ')                                        
+                                            #input(derivaciones)
+                                            for x in range(len(derivaciones)):
+                                                nodo = derivaciones[x]
+                                                f.node(str(contador),nodo)
+                                                edge = Conexion(controles[c].getAncla(),contador)
+                                                conexiones.append(edge)
+                                                for b in range(len(self.gramaticas[i].getNoTerms())):
+                                                    if nodo  == self.gramaticas[i].getNoTerms()[b].getName():
+                                                        control = Control(contador,nodo)
+                                                        controles.append(control)
+                                                contador+=1
+                                            self.gramaticas[i].getProducciones()[s].setYapaso(True)
+                                            mismoNodo=controles[c].getNodo()
+
+                                        else:
+                                        #nuevo codigo    
+                                            nodo = self.gramaticas[i].getProducciones()[s].gettInicial()                                            
+                                            for h in range(len(controles)):
+                                                if nodo == controles[h].getNodo():
+                                                    ancla2 = controles[h].getAncla()                                                    
+                                                    
+                                            #nodo = self.gramaticas[i].getProducciones()[s].gettInicial()                                            
+                                            #f.node(str(contador),nodo)
+                                            #guardo el id que corresponde al nodo
+                                            #ancla=contador                        
+                                            #edge = Conexion(ancla2,ancla)
+                                            #conexiones.append(edge)
+                                            #contador+=1
+                                            #creo los otros nodos que corresponden a la derivacion del terminal inicial
+                                            derivacion = self.gramaticas[i].getProducciones()[s].getDerivacion().split(' ')
+                                            for k in range(len(derivacion)):
+                                                nodo = derivacion[k]
+                                                f.node(str(contador),nodo)
+                                                #uno el nodo raiz con su produccion.
+                                                edge = Conexion(ancla2,contador)
+                                                conexiones.append(edge)
+                                                #valido si lo que viene en su derivación es un No terminal que tiene mas derivaciones
+                                                for t in range(len(self.gramaticas[i].getNoTerms())):
+                                                    if nodo == self.gramaticas[i].getNoTerms()[t].getName():
+                                                        #si encuentro un no terminal creo un objeto que lleva el control de su id para las conexiones
+                                                        control = Control(contador,nodo)
+                                                        controles.append(control)
+                                                contador+=1
+                                            self.gramaticas[i].getProducciones()[s].setYapaso(True)                                            
+                                            #mismoNodo=controles[c].getNodo()
                                                                                            
                 for q in range(len(conexiones)):
                     f.edge(conexiones[q].getInicio(),conexiones[q].getSiguiente())
