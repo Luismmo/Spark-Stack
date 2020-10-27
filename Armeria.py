@@ -5,6 +5,8 @@ class Aefede(object):
         self.alfabeto = []        
         self.eAceptacion = []
         self.transiciones = []
+        self.pila = []
+        self.simbolosPila = []
     
     #getters
     def getName(self):
@@ -13,12 +15,12 @@ class Aefede(object):
         return self.estados
     def getAlfabeto(self):
         return self.alfabeto
-    def geteInicial(self):
-        return self.eInicial
-    def geteAceptacion(self):
-        return self.eAceptacion
     def getTransiciones(self):
         return self.transiciones
+    def getPila(self):
+        return self.pila
+    def getSimbolosPila(self):
+        return self.simbolosPila
 
     #setters
     def setName(self, valor):
@@ -30,7 +32,7 @@ class Aefede(object):
 
 
 class Transicion(object):
-    def __init__(self, inicial, final, leer, sacar, guardar):
+    def __init__(self, inicial, leer, sacar, final, guardar):
         self.eInicial = inicial
         self.eFinal = final
         self.leer = leer

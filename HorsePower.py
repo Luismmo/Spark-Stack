@@ -414,6 +414,8 @@ class SparkStack(object):
                 f.edge('3','3',label=transiciones)
                 f.edge('3','4',label='$,#;$')
                 f.view()
+    
+    #*********************************************
     #*********************************************
     #de aqui en adelante viene lo de los automatas 
     def ModuloAutomatas(self):
@@ -430,11 +432,9 @@ class SparkStack(object):
             print("7- Volver al módulo principal")
             opcion = int(input("\nIngrese una opción: "))
             if opcion == 1:
-                print("cargar archivo")
-                time.sleep(1)
+                self.cargaAFD()
             elif opcion == 2:
-                print("mostrando información")
-                time.sleep(1)
+                self.informacionAutomata()
             elif opcion == 3:
                 print("sacando arbol")
                 time.sleep(1)
@@ -448,4 +448,330 @@ class SparkStack(object):
                 print("de una pasada")
                 time.sleep(1)
             elif opcion == 7:
-                salida3 = False                
+                salida3 = False
+    
+    def cargaAFD(self):
+        self.clrscr()
+        nombre = input("Ingrese el nombre del archivo para generar el/los AP/s: ")
+        archivoAFDS = open(nombre,'r') 
+        Datos = archivoAFDS.read()
+        archivoAFDS.close()
+        divisonAFDS = Datos.split('%')
+        try:
+            divisonAFDS.remove('')
+        except:
+            pass
+        listaAutomatas = []
+        #ciclo for para extraer los datos de cada automata, 
+        # ponerlos en una lista de listas y eliminar elementos en blanco
+        for a in range(len(divisonAFDS)):
+            automata = divisonAFDS[a].split('\n')
+            try:
+                automata.remove('')
+                automata.remove('')
+            except:
+                pass
+            listaAutomatas.append(automata)
+        #Ciclo for para empezar a crear objetos Aefede
+        for i in range(len(listaAutomatas)):
+            try:
+                #verificando si el automata que se quiere agregar ya existe
+                flag = 0
+                for z in range(len(self.automatas)):
+                    if listaAutomatas[i][0] == self.automatas[z].getName():
+                        flag +=1
+                if flag == 0: #el automata no existe y lo agregamos
+                    #tratamos con el nombre
+                    name = str(listaAutomatas[i][0])
+                    aefede = Aefede(name)
+                    self.automatas.append(aefede)
+                    #tratamos con el alfabeto
+                    alpha = listaAutomatas[i][1].split(',')
+                    for k in range(len(alpha)):
+                        self.CrearAlfabeto(name,str(alpha[k]))
+                    #tratamos con los simbolos de pila
+                    simPila = listaAutomatas[i][2].split(',')
+                    for k in range(len(simPila)):
+                        self.CrearSimPila(name,str(simPila[k]))
+                    #tratamos con los estados
+                    estrato = listaAutomatas[i][3].split(',')
+                    for j in range(len(estrato)):
+                        self.CrearEstados(name,str(estrato[j]))                    
+                    #tratamos con el estado inicial
+                    self.AsignarEstadoInicial(name,str(listaAutomatas[i][4]))
+                    #tratamos con los estados de aceptacion
+                    try:
+                        aceptaciones = listaAutomatas[i][5].split(',')
+                        aceptaciones.remove('')
+                    except:
+                        pass
+                    for l in range(len(aceptaciones)):
+                        self.Acetona(name,str(aceptaciones[l]))
+                    #Tratamos con las transiciones
+                    for m in range(len(listaAutomatas[i])):
+                        if m >=6:
+                            self.Transiciones(name,str(listaAutomatas[i][m]))
+                    print("AP cargado correctamente. Presione ENTER.")
+                    time.sleep(0.5)
+
+                else:
+                    print("El AP que se quiere agregar ya existe en memoria")
+                    time.sleep(0.5)
+            except:
+                pass
+    
+    def CrearEstados(self, nome, estado):
+        state = Estado(estado)
+                #print("acabamos de crear el estado")
+        for a in range(len(self.automatas)):
+                    #print("estamos verificando afds")
+            if nome == self.automatas[a].getName():
+                        #print("encontramos el afd")
+                if self.automatas[a].getEstados():
+                    flag = 0
+                    for i in range(len(self.automatas[a].getEstados())):
+                                #print("verificando estados  del afd")
+                        if estado == self.automatas[a].getEstados()[i].getNameE():
+                            flag+=1
+
+                    if flag == 0:
+                        self.automatas[a].getEstados().append(state)
+                    else:
+                        print("El estado ya existe, no puede haber dos estados con el mismo nombre.")
+                                #estesi[a].getEstados().append(state)
+                else:                    
+                    self.automatas[a].getEstados().append(state)
+    
+    def CrearAlfabeto(self, nome, alfa):
+        for a in range(len(self.automatas)):
+            if nome == self.automatas[a].getName():
+                #viendo si no ingresamos un alfabeto que ya está como estado
+                bandera = 0
+                for k in range(len(self.automatas[a].getEstados())):
+                    if alfa == self.automatas[a].getEstados()[k].getNameE():
+                        bandera+=1
+                if bandera==0:
+                    #print("podemos ingresar el alfabeto")
+                    if self.automatas[a].getAlfabeto():    
+                        flag = 0                                                                                
+                        for i in range(len(self.automatas[a].getAlfabeto())):
+                            if alfa == self.automatas[a].getAlfabeto()[i]:                                    
+                                flag+=1
+
+                        if flag == 0:
+                            self.automatas[a].getAlfabeto().append(alfa)
+                        else:
+                            print("El caracter ya existe en el alfabeto.")
+                    else:
+                        self.automatas[a].getAlfabeto().append(alfa)
+                else:
+                    input("El caracter que se quiere agregar como alfabeto ya está como un estado.\nNo se puede realizar la operacion.")
+
+    def CrearSimPila(self, nome, alfa):
+        for a in range(len(self.automatas)):
+            if nome == self.automatas[a].getName():
+                #viendo si no ingresamos un alfabeto que ya está como estado
+                bandera = 0
+                for k in range(len(self.automatas[a].getEstados())):
+                    if alfa == self.automatas[a].getEstados()[k].getNameE():
+                        bandera+=1
+                if bandera==0:
+                    #print("podemos ingresar el alfabeto")
+                    if self.automatas[a].getSimbolosPila():    
+                        flag = 0                                                                                
+                        for i in range(len(self.automatas[a].getSimbolosPila())):
+                            if alfa == self.automatas[a].getSimbolosPila()[i]:                                    
+                                flag+=1
+
+                        if flag == 0:
+                            self.automatas[a].getSimbolosPila().append(alfa)
+                        else:
+                            print("El caracter ya existe en el alfabeto.")
+                    else:
+                        self.automatas[a].getSimbolosPila().append(alfa)
+                else:
+                    input("El caracter que se quiere agregar como alfabeto ya está como un estado.\nNo se puede realizar la operacion.")
+
+    def AsignarEstadoInicial(self, nome, dato):
+        flag = 0
+        for i in range(len(self.automatas)):
+            if nome == self.automatas[i].getName():
+                if self.automatas[i].getEstados():                    
+                    #busco el nuevo estado
+                    for b in range(len(self.automatas[i].getEstados())):
+                        if self.automatas[i].getEstados()[b].getNameE()==dato:
+                            flag+=1
+                            self.automatas[i].getEstados()[b].setInicio(True)                    
+                else:
+                    input("El AP al que intenta asignar un estado inicial no cuenta con ningun estado todavia.")                    
+
+    def Acetona(self,nome,dato):
+        for i in range(len(self.automatas)):
+            if nome == self.automatas[i].getName():
+                if self.automatas[i].getEstados():                                                
+                    for b in range(len(self.automatas[i].getEstados())):
+                        if self.automatas[i].getEstados()[b].getNameE()==dato:                                                                
+                            self.automatas[i].getEstados()[b].setAcepta(True)                         
+                else:
+                    print("El AP al que intenta asignar estados de aceptacion no cuenta con ningun estado todavia.")
+    
+    def Transiciones(self, nome, trans):
+        #try:
+            #A,$,$;B,#
+            frag = trans.split(';')
+                    #  0  , 1
+            #Frag = ["A,$,$","B,#"]
+            #estados = ["A","$","$"]
+            parte1 = frag[0].split(',')
+            parte2 = frag[1].split(',')
+            for i in range(len(self.automatas)):
+                if nome == self.automatas[i].getName():
+                    flag1=0
+                    flag2=0
+                    flag3=0
+                    banderita=0
+                    inicial = None
+                    final = None
+                    #Validando terminal involucrado en la transición.
+                    for c in range(len(self.automatas[i].getAlfabeto())):
+                        if parte1[1] == self.automatas[i].getAlfabeto()[c] or parte1[1]=='$':
+                            flag3+=1
+                                    #input("terminal")
+
+                    #validando estado inicial y que no haya mas de una transición con la misma terminal
+                    for a in range(len(self.automatas[i].getEstados())):
+                        if parte1[0] == self.automatas[i].getEstados()[a].getNameE():
+                            flag1+=1
+                            inicial = self.automatas[i].getEstados()[a]
+                            if self.automatas[i].getEstados()[a].getSalidas():
+
+                                for k in range(len(self.automatas[i].getEstados()[a].getSalidas())):
+                                    if parte1[1]==self.automatas[i].getEstados()[a].getSalidas()[k]:
+                                        banderita+=1                                        
+                                if banderita == 0:
+                                    self.automatas[i].getEstados()[a].getSalidas().append(parte1[1])
+                            else:
+                                self.automatas[i].getEstados()[a].getSalidas().append(parte1[1])
+                                    #input("inicio")
+                    #validando estado final
+                    for b in range(len(self.automatas[i].getEstados())):
+                        if parte2[0]== self.automatas[i].getEstados()[b].getNameE():
+                            flag2+=1
+                            final = self.automatas[i].getEstados()[b]
+                                    #input("final")
+
+                    if flag1!=0 and flag2!=0 and flag3!=0:
+                        if banderita==0:                            
+                            trancy = Transicion(inicial, parte1[1], parte1[2], final, parte2[1])
+                            self.automatas[i].getTransiciones().append(trancy)
+                        else:
+                            print("Ésta acción no se completó.\nUsted está tratando de crear un Automata Finito NO Determinista o Está ingresando una transición que ya existe.")
+                    else:
+                        print("Almenos un estado que está involucrado en ésta transición no existe en la lista de estados de este AFD.\nO bien el terminal involucrado no existe en el alfabeto del AFD")
+        #except:
+            #pass
+    
+    def listarAP(self):
+        for i in range(len(self.automatas)):
+            print("->"+self.automatas[i].getName())
+        print('')
+        opcion = str(input('Ingrese el nombre del automata de pila: '))
+        return opcion
+    
+    def informacionAutomata(self):
+        self.clrscr()
+        print('********* Mostrar información del automata de pila *********\n')
+        name = self.listarAP()
+        nombre = name+".pdf"
+        c = canvas.Canvas(nombre)
+        #parte donde agrego los detalles        
+        titulo = "Nombre: "+name
+        c.setFontSize(20)
+        c.drawString(225,750,titulo)                       
+        c.setFont('Helvetica', 12)
+        for a in range(len(self.automatas)):
+            if name == self.automatas[a].getName():
+                    ##parte del automata               
+                    #alfabeto
+                alfa=""
+                for i in range(len(self.automatas[a].getAlfabeto())):
+                    if i >=1:                        
+                        alfa+=", "+self.automatas[a].getAlfabeto()[i]
+                    else:
+                        alfa+=self.automatas[a].getAlfabeto()[i]
+                c.drawString(75,700,"Alfabeto: "+alfa)
+                #simbolos de pila
+                alfa=""
+                for i in range(len(self.automatas[a].getSimbolosPila())):
+                    if i >=1:                        
+                        alfa+=", "+self.automatas[a].getSimbolosPila()[i]
+                    else:
+                        alfa+=self.automatas[a].getSimbolosPila()[i]
+                c.drawString(75,685,"Alfabeto: "+alfa)
+                    #estados
+                estadio=""
+                for j in range(len(self.automatas[a].getEstados())):
+                    if j >=1:
+                        estadio+=", "+self.automatas[a].getEstados()[j].getNameE()
+                    else:
+                        estadio+=self.automatas[a].getEstados()[j].getNameE()
+                c.drawString(75,670,"Estados: "+estadio)
+                    #inicial
+                estarto=""
+                for k in range(len(self.automatas[a].getEstados())):
+                    if self.automatas[a].getEstados()[k].getInicio()==True:
+                        estarto=self.automatas[a].getEstados()[k].getNameE()
+                c.drawString(75,655,"Estado inicial: "+estarto)
+                    #estados de aceptación
+                estufa=""
+                bandy = 0
+                for l in range(len(self.automatas[a].getEstados())):
+                    if self.automatas[a].getEstados()[l].getAcepta()==True:
+                        if bandy>=1:                            
+                            estufa+=", "+self.automatas[a].getEstados()[l].getNameE()
+                        else:
+                            estufa+=self.automatas[a].getEstados()[l].getNameE()
+                            bandy+=1
+                c.drawString(75,640,"Estados de aceptación: "+estufa)
+                                
+                    #grafica
+                self.generarDot(name)
+                    #"C:\\Users\\almxo\\Desktop\\"+nome+".dot"
+                    #os.system('dot -Tpng archivo.dot -o salida.png')
+                os.system('dot -Tpng '+ name+'.dot -o '+name+'.png')
+                    #subprocess.call(nome+".dot -Tpng -o "+nome+".png")
+                pato=name+".png"                
+                c.drawImage(pato,75,450, 400,100)                                
+        c.save()
+        os.system(nombre)
+
+    def generarDot(self, nome):
+        try:
+            archivo = open(nome+".dot", 'w')
+            archivo.write("digraph A {\n")
+            archivo.write("rankdir = LR;\n")
+            archivo.write("EMPTY [style=invis]\n")
+            archivo.write("EMPTY [shape=point]\n")
+            for a in range(len(self.automatas)):
+                if nome == self.automatas[a].getName():
+                    #agregando estados al dot
+                    for i in range(len(self.automatas[a].getEstados())):
+                        if self.automatas[a].getEstados()[i].getAcepta()==True:
+                            archivo.write("node [shape=doublecircle,style=filled] "+self.automatas[a].getEstados()[i].getNameE()+"\n")
+                        else:
+                            archivo.write("node [shape=circle,style=filled] "+self.automatas[a].getEstados()[i].getNameE()+"\n")
+                    #agregando transiciones
+                    eInicial=""
+                    for h in range(len(self.automatas[a].getEstados())):
+                        if self.automatas[a].getEstados()[h].getInicio()==True:
+                            eInicial=self.automatas[a].getEstados()[h].getNameE()
+                    #EMPTY -> INCIO [label =""];
+                    archivo.write("EMPTY"+" -> "+eInicial+" [label=\" "+" \"];\n")
+                    for j in range(len(self.automatas[a].getTransiciones())):
+                        
+                        archivo.write(self.automatas[a].getTransiciones()[j].geteInicial().getNameE()+" -> "+self.automatas[a].getTransiciones()[j].geteFinal().getNameE()+" [label=\""+self.automatas[a].getTransiciones()[j].getLeer()+","+self.automatas[a].getTransiciones()[j].getSacar()+";"+self.automatas[a].getTransiciones()[j].getGuardar()+" \"];\n")
+                    archivo.write("}")
+            archivo.close()     
+        except:
+            pass
+        
