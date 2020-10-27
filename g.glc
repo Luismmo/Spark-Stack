@@ -1,13 +1,9 @@
 Selvin
-S,M,A,B
-a,b,x,y,z,u,m,v
-S
-S>M
-M>A a b B
-A>x
-A>y
-A>z
-B>u
-B>m
-B>v
+X,Y
+a,b
+X
+X>a X d
+X>Y
+X>a
+Y>b Y c
 %

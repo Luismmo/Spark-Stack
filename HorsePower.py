@@ -381,7 +381,21 @@ class SparkStack(object):
         for i in range(len(self.gramaticas)):
             if name == self.gramaticas[i].getName():
                 f = Digraph(filename = self.gramaticas[i].getName(), format='pdf', encoding='UTF-8')
-                f.attr(rankdir = 'LR')
+                f.attr(rankdir = 'LR')                
+                f.attr(fontsize='12')
+                texto = ""
+                texto += "Nombre: "+str(self.gramaticas[i].getName())+"\n"
+                texto += "Alfabeto: "+str(self.gramaticas[i].getTerminales())+"\n"                
+                lista = []
+                lista +=self.gramaticas[i].getTerminales()
+                for k in range(len(self.gramaticas[i].getNoTerms())):
+                    lista.append(self.gramaticas[i].getNoTerms()[k].getName())
+                lista.append('#')
+                texto += "Alfabeto de pila: "+str(lista)+"\n"                
+                texto+="Estados: [ i, p, q, f ]\n"
+                texto+="Estado inicial: [ i ]\n"
+                texto+="Estado de aceptación: [ f ]"
+                f.attr(label=texto)
                 f.attr('node', shape='none')
                 f.node("0","")
                 f.attr('node', shape='circle')
@@ -390,19 +404,6 @@ class SparkStack(object):
                 f.node("3","q")
                 f.attr('node', shape='doublecircle')
                 f.node("4","f")
-                f.attr(fontsize='20')
-                f.attr(label= r"Nombre: "+str(self.gramaticas[i].getName()))
-                f.attr(fontsize='12')
-                alfabeto = "Alfabeto: "+str(self.gramaticas[i].getTerminales())
-                f.attr(label=alfabeto)
-                lista = []
-                lista +=self.gramaticas[i].getTerminales()
-                lista.extend(self.gramaticas[i].getNoTerms())
-                aPila = "Alfabeto de pila: "+str(lista)
-                f.attr(label=aPila)                
-                f.attr(label="Estados: [i, p, q, f]")
-                f.attr(label="Estado inicial: [i]")
-                f.attr(label="Estado de aceptación: [f]")
                 f.edge('0','1')
                 f.edge('1','2', label='$,$;#')
                 f.edge('2','3', label='$,$;S')
@@ -775,3 +776,37 @@ class SparkStack(object):
         except:
             pass
         
+    def validarCadenaAFD(self, nome,cadena):        
+        aceptamos = False
+        ruta = []
+        bandera = 0        
+        final = ""
+        #print(cadena.__len__())
+        for i in range(len(self.boveda)):
+            if nome == self.boveda[i].getName() and self.boveda[i].getTipo()=="AFD":
+                #for para la cadena ingresada
+                for a in range(cadena.__len__()):
+                    #print("empezamos con el for de la cadena")
+                    #for para recorrer las transiciones del automata
+                    for b in range(len(self.boveda[i].getTransiciones())):
+                        #print("empezamos con el for de las transiciones")
+                        if bandera == 0:
+                            if self.boveda[i].getTransiciones()[b].geteInicial().getInicio()==True and cadena[a]==self.boveda[i].getTransiciones()[b].getEntrada():
+                                bandera+=1                                
+                                aceptamos = self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()
+                                final = self.boveda[i].getTransiciones()[b].geteFinal().getNameE()
+                                transicion = self.boveda[i].getTransiciones()[b].geteInicial().getNameE()+","+self.boveda[i].getTransiciones()[b].getEntrada()+";"+self.boveda[i].getTransiciones()[b].geteFinal().getNameE()
+                                ruta.append(transicion)
+                                break
+                                #print("aceptacion transicion 1" + str(self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()))
+                                #input("pasa en el inicial")                            
+                        else:
+                            if final == self.boveda[i].getTransiciones()[b].geteInicial().getNameE() and cadena[a]==self.boveda[i].getTransiciones()[b].getEntrada():
+                                aceptamos = self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()
+                                final = self.boveda[i].getTransiciones()[b].geteFinal().getNameE()
+                                transicion = self.boveda[i].getTransiciones()[b].geteInicial().getNameE()+","+self.boveda[i].getTransiciones()[b].getEntrada()+";"+self.boveda[i].getTransiciones()[b].geteFinal().getNameE()
+                                ruta.append(transicion)
+                                break
+                                #print("aceptacion transicion " + str(b+1) + str(self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()))
+                                #input("pasa en los demas transiciones")                            
+        return aceptamos, ruta
