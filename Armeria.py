@@ -27,8 +27,8 @@ class Aefede(object):
         self.nombre = valor
     def seteInicial(self, valor):
         self.eInicial = valor
-    def setAlfabeto(self,valor):
-        self.alfabeto=valor
+    def setPila(self,valor):
+        self.pila=valor
 
 
 class Transicion(object):

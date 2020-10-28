@@ -20,10 +20,15 @@ f.node('2','C')
 f.edge('0','2')
 f.view() """
 a = []
+print("Tamaño: "+str(len(a)))
 a.append(1)
 a.append(2)
 print(a)
-a= []
+print("Tamaño: "+str(len(a)))
+a.remove(1)
+a.remove(2)
+print("Tamaño: "+str(len(a)))
 a.append("d")
 a.append("d")
+print("Tamaño: "+str(len(a)))
 print(a)

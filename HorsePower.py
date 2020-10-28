@@ -437,11 +437,26 @@ class SparkStack(object):
             elif opcion == 2:
                 self.informacionAutomata()
             elif opcion == 3:
-                print("sacando arbol")
-                time.sleep(1)
+                self.clrscr()
+                print('********* Validar una cadena *********\n')
+                resultados = []
+                resultados = self.validarCadenaAFD()
+                if resultados[0] == True:
+                    input('¡CADENA VALIDA!\nPrsione ENTER para volver al menú principal.')
+                else:
+                    input('¡CADENA INVALIDA!\nPrsione ENTER para volver al menú principal.')
             elif opcion == 4:
-                print("generando equivalente")
-                time.sleep(1)
+                self.clrscr()
+                print('********* Ruta de validación *********\n')
+                resultados = []
+                resultados = self.validarCadenaAFD()
+                if resultados[0] == True:
+                    print('¡CADENA VALIDA!')
+                    for u in range(len(resultados[1])):
+                        print(resultados[1][u])
+                    input('Prsione ENTER para volver al menú principal.')
+                else:                    
+                    input('¡CADENA INVALIDA!\nPrsione ENTER para volver al menú principal.')
             elif opcion == 5:
                 print("recorrido paso a paso")
                 time.sleep(1)
@@ -640,7 +655,13 @@ class SparkStack(object):
                                     #input("terminal")
 
                     #validando estado inicial y que no haya mas de una transición con la misma terminal
-                    for a in range(len(self.automatas[i].getEstados())):
+                    #validando estado final
+                    for b in range(len(self.automatas[i].getEstados())):
+                        if parte1[0]== self.automatas[i].getEstados()[b].getNameE():
+                            flag1+=1
+                            inicial = self.automatas[i].getEstados()[b]
+                    #
+                    """ for a in range(len(self.automatas[i].getEstados())):
                         if parte1[0] == self.automatas[i].getEstados()[a].getNameE():
                             flag1+=1
                             inicial = self.automatas[i].getEstados()[a]
@@ -652,7 +673,7 @@ class SparkStack(object):
                                 if banderita == 0:
                                     self.automatas[i].getEstados()[a].getSalidas().append(parte1[1])
                             else:
-                                self.automatas[i].getEstados()[a].getSalidas().append(parte1[1])
+                                self.automatas[i].getEstados()[a].getSalidas().append(parte1[1]) """
                                     #input("inicio")
                     #validando estado final
                     for b in range(len(self.automatas[i].getEstados())):
@@ -661,12 +682,9 @@ class SparkStack(object):
                             final = self.automatas[i].getEstados()[b]
                                     #input("final")
 
-                    if flag1!=0 and flag2!=0 and flag3!=0:
-                        if banderita==0:                            
-                            trancy = Transicion(inicial, parte1[1], parte1[2], final, parte2[1])
-                            self.automatas[i].getTransiciones().append(trancy)
-                        else:
-                            print("Ésta acción no se completó.\nUsted está tratando de crear un Automata Finito NO Determinista o Está ingresando una transición que ya existe.")
+                    if flag1!=0 and flag2!=0 and flag3!=0:                        
+                        trancy = Transicion(inicial, parte1[1], parte1[2], final, parte2[1])
+                        self.automatas[i].getTransiciones().append(trancy)                        
                     else:
                         print("Almenos un estado que está involucrado en ésta transición no existe en la lista de estados de este AFD.\nO bien el terminal involucrado no existe en el alfabeto del AFD")
         #except:
@@ -742,7 +760,7 @@ class SparkStack(object):
                 os.system('dot -Tpng '+ name+'.dot -o '+name+'.png')
                     #subprocess.call(nome+".dot -Tpng -o "+nome+".png")
                 pato=name+".png"                
-                c.drawImage(pato,75,450, 400,100)                                
+                c.drawImage(pato,75,450, 450,100)                                
         c.save()
         os.system(nombre)
 
@@ -776,37 +794,76 @@ class SparkStack(object):
         except:
             pass
         
-    def validarCadenaAFD(self, nome,cadena):        
+    def validarCadenaAFD(self):        
+        nome = self.listarAP()
         aceptamos = False
         ruta = []
         bandera = 0        
         final = ""
+        banderazo = 0
         #print(cadena.__len__())
-        for i in range(len(self.boveda)):
-            if nome == self.boveda[i].getName() and self.boveda[i].getTipo()=="AFD":
+        for i in range(len(self.automatas)):
+            if nome == self.automatas[i].getName():
+                cadena ="#"
+                cadena += input("Ingrese la cadena a evaluar: ")                
+                cadena+='#'
+                #print(cadena)
                 #for para la cadena ingresada
                 for a in range(cadena.__len__()):
                     #print("empezamos con el for de la cadena")
                     #for para recorrer las transiciones del automata
-                    for b in range(len(self.boveda[i].getTransiciones())):
+                    for b in range(len(self.automatas[i].getTransiciones())):
                         #print("empezamos con el for de las transiciones")
                         if bandera == 0:
-                            if self.boveda[i].getTransiciones()[b].geteInicial().getInicio()==True and cadena[a]==self.boveda[i].getTransiciones()[b].getEntrada():
-                                bandera+=1                                
-                                aceptamos = self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()
-                                final = self.boveda[i].getTransiciones()[b].geteFinal().getNameE()
-                                transicion = self.boveda[i].getTransiciones()[b].geteInicial().getNameE()+","+self.boveda[i].getTransiciones()[b].getEntrada()+";"+self.boveda[i].getTransiciones()[b].geteFinal().getNameE()
-                                ruta.append(transicion)
+                            if self.automatas[i].getTransiciones()[b].geteInicial().getInicio()==True:
+                                #print("reconozco el inicio")
+                                bandera+=1                                                                
+                                final = self.automatas[i].getTransiciones()[b].geteFinal().getNameE()
+                                transicion = self.automatas[i].getTransiciones()[b].geteInicial().getNameE()+","+self.automatas[i].getTransiciones()[b].getLeer()+","+self.automatas[i].getTransiciones()[b].getSacar()+";"+self.automatas[i].getTransiciones()[b].geteFinal().getNameE()+","+self.automatas[i].getTransiciones()[b].getGuardar()
+                                if self.automatas[i].getTransiciones()[b].getGuardar() != '$':
+                                    self.automatas[i].getPila().append(self.automatas[i].getTransiciones()[b].getGuardar())
+                                ruta.append(transicion)                                
                                 break
                                 #print("aceptacion transicion 1" + str(self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()))
                                 #input("pasa en el inicial")                            
                         else:
-                            if final == self.boveda[i].getTransiciones()[b].geteInicial().getNameE() and cadena[a]==self.boveda[i].getTransiciones()[b].getEntrada():
-                                aceptamos = self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()
-                                final = self.boveda[i].getTransiciones()[b].geteFinal().getNameE()
-                                transicion = self.boveda[i].getTransiciones()[b].geteInicial().getNameE()+","+self.boveda[i].getTransiciones()[b].getEntrada()+";"+self.boveda[i].getTransiciones()[b].geteFinal().getNameE()
-                                ruta.append(transicion)
-                                break
+                            if final == self.automatas[i].getTransiciones()[b].geteInicial().getNameE():
+                                if cadena[a]==self.automatas[i].getTransiciones()[b].getLeer():
+                                    #print("reconozco las demas transiciones")
+                                    #aceptamos = self.automatas[i].getTransiciones()[b].geteFinal().getAcepta()
+                                    final = self.automatas[i].getTransiciones()[b].geteFinal().getNameE()
+                                    transicion = self.automatas[i].getTransiciones()[b].geteInicial().getNameE()+","+self.automatas[i].getTransiciones()[b].getLeer()+","+self.automatas[i].getTransiciones()[b].getSacar()+";"+self.automatas[i].getTransiciones()[b].geteFinal().getNameE()+","+self.automatas[i].getTransiciones()[b].getGuardar()
+                                    ruta.append(transicion)
+                                    #print(self.automatas[i].getPila())
+                                    if self.automatas[i].getTransiciones()[b].getGuardar() != '$':
+                                        self.automatas[i].getPila().append(self.automatas[i].getTransiciones()[b].getGuardar())
+                                    if self.automatas[i].getTransiciones()[b].getSacar() != '$':
+                                        try:
+                                            self.automatas[i].getPila().remove(self.automatas[i].getTransiciones()[b].getSacar())
+                                        except:
+                                            pass
+                                            #input("algo salió mal")
+                                            banderazo+=1
+                                    break
                                 #print("aceptacion transicion " + str(b+1) + str(self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()))
-                                #input("pasa en los demas transiciones")                            
+                                #input("pasa en los demas transiciones")  
+                                if cadena[a]=='#' and self.automatas[i].getTransiciones()[b].getLeer() =='$':
+                                    #print("reconozco el final")
+                                    #aceptamos = self.automatas[i].getTransiciones()[b].geteFinal().getAcepta()                                    
+                                    transicion = self.automatas[i].getTransiciones()[b].geteInicial().getNameE()+","+self.automatas[i].getTransiciones()[b].getLeer()+","+self.automatas[i].getTransiciones()[b].getSacar()+";"+self.automatas[i].getTransiciones()[b].geteFinal().getNameE()+","+self.automatas[i].getTransiciones()[b].getGuardar()
+                                    ruta.append(transicion)
+                                    if self.automatas[i].getTransiciones()[b].getGuardar() != '$':
+                                        self.automatas[i].getPila().append(self.automatas[i].getTransiciones()[b].getGuardar())
+                                    if self.automatas[i].getTransiciones()[b].getSacar() != '$':
+                                        #print('tengo que eliminar')
+                                        try:    
+                                            self.automatas[i].getPila().remove(self.automatas[i].getTransiciones()[b].getSacar())
+                                        except:
+                                            pass
+                                    break
+                #print(self.automatas[i].getPila())
+                if len(self.automatas[i].getPila())==0 and banderazo == 0: 
+                    aceptamos = True
+                nuevaPila = []
+                self.automatas[i].setPila(nuevaPila)
         return aceptamos, ruta
