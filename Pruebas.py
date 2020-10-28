@@ -19,7 +19,7 @@ f.edge('0','1')
 f.node('2','C')
 f.edge('0','2')
 f.view() """
-a = []
+""" a = []
 print("Tamaño: "+str(len(a)))
 a.append(1)
 a.append(2)
@@ -31,4 +31,4 @@ print("Tamaño: "+str(len(a)))
 a.append("d")
 a.append("d")
 print("Tamaño: "+str(len(a)))
-print(a)
+print(a) """

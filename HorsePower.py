@@ -461,8 +461,7 @@ class SparkStack(object):
                 print("recorrido paso a paso")
                 time.sleep(1)
             elif opcion == 6:
-                print("de una pasada")
-                time.sleep(1)
+                self.validarPasada()
             elif opcion == 7:
                 salida3 = False
     
@@ -527,7 +526,7 @@ class SparkStack(object):
                     for m in range(len(listaAutomatas[i])):
                         if m >=6:
                             self.Transiciones(name,str(listaAutomatas[i][m]))
-                    print("AP cargado correctamente. Presione ENTER.")
+                    print("AP cargado correctamente.")
                     time.sleep(0.5)
 
                 else:
@@ -867,3 +866,113 @@ class SparkStack(object):
                 nuevaPila = []
                 self.automatas[i].setPila(nuevaPila)
         return aceptamos, ruta
+    
+    def validarPasada(self):        
+        self.clrscr()
+        print("****** Validar cadena de una pasada ******")
+        name = self.listarAP()        
+        for i in range(len(self.automatas)):
+            if name == self.automatas[i].getName():
+                nombre = name+".pdf"
+                c = canvas.Canvas(nombre)
+                #parte donde agrego los detalles        
+                titulo = "Nombre: "+name
+                c.setFontSize(20)
+                c.drawString(225,750,titulo)
+                c.setFontSize(12)
+                archivo = open(name+".dot", 'w')
+                archivo.write("digraph A {\n")
+                archivo.write("shape = plaintext\n")
+                archivo.write("label=<\n")
+                archivo.write("<table border='0' cellborder='1' cellspacing='0'>\n")
+                archivo.write("<tr><td>Iteracion</td><td>Pila</td><td>Entrada</td><td>Transicion</td></tr>\n")
+                #start
+                aceptamos = False
+                ruta = []
+                bandera = 0        
+                final = ""
+                banderazo = 0
+                #alv
+                entrada = ""
+                cadena ="#"
+                cadena += input("Ingrese la cadena a evaluar: ")                
+                cadena+='#'                
+                #for para la cadena ingresada
+                for a in range(cadena.__len__()):
+                    #print("empezamos con el for de la cadena")
+                    #for para recorrer las transiciones del automata
+                    for b in range(len(self.automatas[i].getTransiciones())):
+                        #print("empezamos con el for de las transiciones")
+                        if bandera == 0:
+                            if self.automatas[i].getTransiciones()[b].geteInicial().getInicio()==True:
+                                #print("reconozco el inicio")
+                                bandera+=1                                                                
+                                final = self.automatas[i].getTransiciones()[b].geteFinal().getNameE()
+                                transicion = self.automatas[i].getTransiciones()[b].geteInicial().getNameE()+","+self.automatas[i].getTransiciones()[b].getLeer()+","+self.automatas[i].getTransiciones()[b].getSacar()+";"+self.automatas[i].getTransiciones()[b].geteFinal().getNameE()+","+self.automatas[i].getTransiciones()[b].getGuardar()
+                                if self.automatas[i].getTransiciones()[b].getGuardar() != '$':
+                                    self.automatas[i].getPila().append(self.automatas[i].getTransiciones()[b].getGuardar())
+                                ruta.append(transicion)
+                                archivo.write("<tr><td>"+str(a)+"</td><td>"+str(self.automatas[i].getPila())+"</td><td></td><td>"+transicion+"</td></tr>\n")
+                                break
+                                #print("aceptacion transicion 1" + str(self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()))
+                                #input("pasa en el inicial")                            
+                        else:
+                            if final == self.automatas[i].getTransiciones()[b].geteInicial().getNameE():
+                                if cadena[a]==self.automatas[i].getTransiciones()[b].getLeer():
+                                    entrada+=cadena[a] 
+                                    #print("reconozco las demas transiciones")
+                                    #aceptamos = self.automatas[i].getTransiciones()[b].geteFinal().getAcepta()
+                                    final = self.automatas[i].getTransiciones()[b].geteFinal().getNameE()
+                                    transicion = self.automatas[i].getTransiciones()[b].geteInicial().getNameE()+","+self.automatas[i].getTransiciones()[b].getLeer()+","+self.automatas[i].getTransiciones()[b].getSacar()+";"+self.automatas[i].getTransiciones()[b].geteFinal().getNameE()+","+self.automatas[i].getTransiciones()[b].getGuardar()
+                                    ruta.append(transicion)
+                                    #print(self.automatas[i].getPila())
+                                    if self.automatas[i].getTransiciones()[b].getGuardar() != '$':
+                                        self.automatas[i].getPila().append(self.automatas[i].getTransiciones()[b].getGuardar())
+                                    if self.automatas[i].getTransiciones()[b].getSacar() != '$':
+                                        try:
+                                            self.automatas[i].getPila().pop()
+                                        except:
+                                            pass
+                                            #input("algo salió mal")
+                                            banderazo+=1
+                                    archivo.write("<tr><td>"+str(a)+"</td><td>"+str(self.automatas[i].getPila())+"</td><td>"+entrada+"</td><td>"+transicion+"</td></tr>\n")
+                                    break
+                                #print("aceptacion transicion " + str(b+1) + str(self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()))
+                                #input("pasa en los demas transiciones")  
+                                if cadena[a]=='#' and self.automatas[i].getTransiciones()[b].getLeer() =='$':
+                                    #print("reconozco el final")
+                                    #aceptamos = self.automatas[i].getTransiciones()[b].geteFinal().getAcepta()                                    
+                                    transicion = self.automatas[i].getTransiciones()[b].geteInicial().getNameE()+","+self.automatas[i].getTransiciones()[b].getLeer()+","+self.automatas[i].getTransiciones()[b].getSacar()+";"+self.automatas[i].getTransiciones()[b].geteFinal().getNameE()+","+self.automatas[i].getTransiciones()[b].getGuardar()
+                                    ruta.append(transicion)
+                                    if self.automatas[i].getTransiciones()[b].getGuardar() != '$':
+                                        self.automatas[i].getPila().append(self.automatas[i].getTransiciones()[b].getGuardar())
+                                    if self.automatas[i].getTransiciones()[b].getSacar() != '$':
+                                        #print('tengo que eliminar')
+                                        try:    
+                                            self.automatas[i].getPila().pop()
+                                        except:
+                                            pass
+                                    archivo.write("<tr><td>"+str(a)+"</td><td>"+str(self.automatas[i].getPila())+"</td><td>"+entrada+"</td><td>"+transicion+"</td></tr>\n")
+                                    break
+                #print(self.automatas[i].getPila())
+                if len(self.automatas[i].getPila())==0 and banderazo == 0: 
+                    aceptamos = True
+                nuevaPila = []
+                self.automatas[i].setPila(nuevaPila)
+                
+                #end
+                if aceptamos==True:                    
+                    archivo.write("<tr><td colspan='4'>Cadena valida</td></tr>\n")
+                else:
+                    archivo.write("<tr><td colspan='4'>Cadena invalida</td></tr>\n")
+                archivo.write("</table>\n")
+                archivo.write(">\n")
+                archivo.write("}")
+                archivo.close()
+                os.system('dot -Tpng '+ name+'.dot -o '+name+'.png')
+                pato=name+".png"                
+                c.drawImage(pato,110,440)
+                c.save()
+                os.system(nombre)
+                input("perate")
+                

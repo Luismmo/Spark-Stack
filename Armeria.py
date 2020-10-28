@@ -55,19 +55,14 @@ class Estado(object):
         self.name = nombre
         self.aceptacion = False
         self.inicio = False
-        self.salidas= []
-        self.alto = False
+        
     #Getters
     def getNameE(self):
         return str(self.name)
     def getAcepta(self):
         return self.aceptacion
     def getInicio(self):
-        return self.inicio
-    def getSalidas(self):        
-        return self.salidas
-    def getAlto(self):
-        return self.alto
+        return self.inicio    
 
     def setSalidas(self,valor):
         self.salidas=valor
