@@ -40,52 +40,64 @@ class SparkStack(object):
             print("Tiempo restante para la ejecución del programa: "+str(5-a))
             time.sleep(1)
             self.clrscr()
-        self.Menu() 
+            self.Menu()         
 
     def Menu(self):
-        salida = True
-        while salida:
-            self.clrscr()
-            print("************** Módulo principal **************\n")
-            print("1- Modulo gramática libre de contexto")
-            print("2- Módulo autómatas de pila")
-            print("3- Salir")
-            opcion = int(input("\nIngrese una opcion: "))
-            if opcion==1:
-                self.ModuloGramaticas()
-            elif opcion == 2:
-                self.ModuloAutomatas()
-            elif opcion == 3:                
-                salida = False
+        try:
+            salida = True
+            while salida:
                 self.clrscr()
+                print("************** Módulo principal **************\n")
+                print("1- Modulo gramática libre de contexto")
+                print("2- Módulo autómatas de pila")
+                print("3- Salir")
+                opcion = int(input("\nIngrese una opcion: "))
+                if opcion==1:
+                    try:
+                        self.ModuloGramaticas()
+                    except:
+                        self.ModuloGramaticas()
+                elif opcion == 2:
+                    try:
+                        self.ModuloAutomatas()
+                    except:
+                        self.ModuloAutomatas()
+                elif opcion == 3:                
+                    salida = False
+                    self.clrscr()
+        except:
+            self.Menu()
     
     #**************************************************************
     #Aqui en adelante viene lo de las gramaticas libres de contexto
     def ModuloGramaticas(self):
-        salida2 =True
-        while salida2:
-            self.clrscr()
-            print("******** Módulo de gramaticas libres de contexto ********\n")
-            print("1- Cargar archivo")
-            print("2- Mostrar información general")
-            print("3- Árbol de derivación")
-            print("4- Generar autómata de pila equivalente")
-            print("5- Volver al módulo principal")
-            opcion = int(input("\nIngrese una opción: "))
-            if opcion == 1:
-                self.cargarArchivo()
-                time.sleep(1)
-            elif opcion == 2:
-                self.MostrarInformacion()
-                #time.sleep(1)
-            elif opcion == 3:
-                self.generarArbol()
-                #time.sleep(1)
-            elif opcion == 4:
-                self.automataEquivalente()
-                time.sleep(1)
-            elif opcion == 5:
-                salida2 = False
+        try:
+            salida2 =True
+            while salida2:
+                self.clrscr()
+                print("******** Módulo de gramaticas libres de contexto ********\n")
+                print("1- Cargar archivo")
+                print("2- Mostrar información general")
+                print("3- Árbol de derivación")
+                print("4- Generar autómata de pila equivalente")
+                print("5- Volver al módulo principal")
+                opcion = int(input("\nIngrese una opción: "))
+                if opcion == 1:
+                    self.cargarArchivo()
+                    time.sleep(1)
+                elif opcion == 2:
+                    self.MostrarInformacion()
+                    #time.sleep(1)
+                elif opcion == 3:
+                    self.generarArbol()
+                    #time.sleep(1)
+                elif opcion == 4:
+                    self.automataEquivalente()
+                    time.sleep(1)
+                elif opcion == 5:
+                    salida2 = False
+        except:
+            self.ModuloGramaticas()
         
     def CrearNoTerminal(self,nome,NT):
         terminator = noTerminal(NT)
@@ -171,67 +183,70 @@ class SparkStack(object):
          #   pass
 
     def cargarArchivo(self):
-        self.clrscr()
-        nombre = str(input("Ingrese el nombre del archivo: "))
-        archivo = open(nombre,'r')
-        bailemos = archivo.read()
-        archivo.close()
-        #separamos las gramaticas
-        primeraRonda = bailemos.split('%')
         try:
-            primeraRonda.remove('')            
-        except:
-            pass        
-        #ciclo for para extraer los datos de cada Gramatica, 
-        # ponerlos en una lista de listas y eliminar elementos en blanco
-        for a in range(len(primeraRonda)):
-            gramatica = primeraRonda[a].split('\n')
+            self.clrscr()
+            nombre = str(input("Ingrese el nombre del archivo: "))
+            archivo = open(nombre,'r')
+            bailemos = archivo.read()
+            archivo.close()
+            #separamos las gramaticas
+            primeraRonda = bailemos.split('%')
             try:
-                gramatica.remove('')
-                gramatica.remove('')
+                primeraRonda.remove('')            
             except:
-                pass
-            
-            name = str(gramatica[0])
-            print(name)
-            #verificamos que no se repitan nombres
-            flag = self.verificarGR(name)
-            if flag == False: #no se repite
-                GT3 = Gramatica(name)
-                self.gramaticas.append(GT3)
-
-                #creamos y agregamos los No Terminales a la gramatica
-                noTerminales = gramatica[1].split(',')
-                for i in range(len(noTerminales)):
-                    self.CrearNoTerminal(name,str(noTerminales[i]))
-
-                #agregamos los terminales a la gramatica
-                terminales = gramatica[2].split(',')
-                for j in range(len(terminales)):
-                    self.AgregarTerminales(name,str(terminales[j]))
+                pass        
+            #ciclo for para extraer los datos de cada Gramatica, 
+            # ponerlos en una lista de listas y eliminar elementos en blanco
+            for a in range(len(primeraRonda)):
+                gramatica = primeraRonda[a].split('\n')
+                try:
+                    gramatica.remove('')
+                    gramatica.remove('')
+                except:
+                    pass
                 
-                #asignamos el No terminal inicial
-                self.AsignarNoTerminalInicial(name,str(gramatica[3]))
+                name = str(gramatica[0])
+                print(name)
+                #verificamos que no se repitan nombres
+                flag = self.verificarGR(name)
+                if flag == False: #no se repite
+                    GT3 = Gramatica(name)
+                    self.gramaticas.append(GT3)
 
-                #tratamos con las producciones
-                for m in range(len(gramatica)):
-                    if m >= 4:
-                        #print(gramatica[m])
-                        self.CrearProducciones(name,str(gramatica[m]))
+                    #creamos y agregamos los No Terminales a la gramatica
+                    noTerminales = gramatica[1].split(',')
+                    for i in range(len(noTerminales)):
+                        self.CrearNoTerminal(name,str(noTerminales[i]))
 
-                for q in range(len(self.gramaticas)):
-                    if name == self.gramaticas[q].getName():
-                        esTipo3 = self.gramaticas[q].getTipo3()
-                        if esTipo3 == True:
-                            print("Gramatica agregada con éxito.\n")
-                            time.sleep(1.3)
-                        else:
-                            self.gramaticas.pop(q)
-                            print("Es gramatica regular. SE DESCARTA.\n")
-                            time.sleep(1.3)
-            else: #se repite
-                print("Aviso: Se encontró una gramatica con el mismo nombre en memoria, la accion no se puede completar.")
-                time.sleep(1.3)
+                    #agregamos los terminales a la gramatica
+                    terminales = gramatica[2].split(',')
+                    for j in range(len(terminales)):
+                        self.AgregarTerminales(name,str(terminales[j]))
+                    
+                    #asignamos el No terminal inicial
+                    self.AsignarNoTerminalInicial(name,str(gramatica[3]))
+
+                    #tratamos con las producciones
+                    for m in range(len(gramatica)):
+                        if m >= 4:
+                            #print(gramatica[m])
+                            self.CrearProducciones(name,str(gramatica[m]))
+
+                    for q in range(len(self.gramaticas)):
+                        if name == self.gramaticas[q].getName():
+                            esTipo3 = self.gramaticas[q].getTipo3()
+                            if esTipo3 == True:
+                                print("Gramatica agregada con éxito.\n")
+                                time.sleep(1.3)
+                            else:
+                                self.gramaticas.pop(q)
+                                print("Es gramatica regular. SE DESCARTA.\n")
+                                time.sleep(1.3)
+                else: #se repite
+                    print("Aviso: Se encontró una gramatica con el mismo nombre en memoria, la accion no se puede completar.")
+                    time.sleep(1.3)
+        except:
+            input("El archivo que se quiere cargar no cuenta con la estructura que demanda el programa")
 
     def listarGramaticas(self):        
         for a in range(len(self.gramaticas)):
@@ -420,119 +435,125 @@ class SparkStack(object):
     #*********************************************
     #de aqui en adelante viene lo de los automatas 
     def ModuloAutomatas(self):
-        salida3 =True
-        while salida3:
-            self.clrscr()
-            print("******** Módulo de autómatas de pila ********\n")
-            print("1- Cargar archivo")
-            print("2- Mostrar información general")
-            print("3- Validar una cadena")
-            print("4- Ruta de validación")
-            print("5- Recorrido paso a paso")
-            print("6- Validar cadena en una pasada")
-            print("7- Volver al módulo principal")
-            opcion = int(input("\nIngrese una opción: "))
-            if opcion == 1:
-                self.cargaAFD()
-            elif opcion == 2:
-                self.informacionAutomata()
-            elif opcion == 3:
+        try:
+            salida3 =True
+            while salida3:
                 self.clrscr()
-                print('********* Validar una cadena *********\n')
-                resultados = []
-                resultados = self.validarCadenaAFD()
-                if resultados[0] == True:
-                    input('¡CADENA VALIDA!\nPrsione ENTER para volver al menú principal.')
-                else:
-                    input('¡CADENA INVALIDA!\nPrsione ENTER para volver al menú principal.')
-            elif opcion == 4:
-                self.clrscr()
-                print('********* Ruta de validación *********\n')
-                resultados = []
-                resultados = self.validarCadenaAFD()
-                if resultados[0] == True:
-                    print('¡CADENA VALIDA!')
-                    for u in range(len(resultados[1])):
-                        print(resultados[1][u])
-                    input('Prsione ENTER para volver al menú principal.')
-                else:                    
-                    input('¡CADENA INVALIDA!\nPrsione ENTER para volver al menú principal.')
-            elif opcion == 5:
-                self.recorridoApaso()
-            elif opcion == 6:
-                self.validarPasada()
-            elif opcion == 7:
-                salida3 = False
+                print("******** Módulo de autómatas de pila ********\n")
+                print("1- Cargar archivo")
+                print("2- Mostrar información general")
+                print("3- Validar una cadena")
+                print("4- Ruta de validación")
+                print("5- Recorrido paso a paso")
+                print("6- Validar cadena en una pasada")
+                print("7- Volver al módulo principal")
+                opcion = int(input("\nIngrese una opción: "))
+                if opcion == 1:
+                    self.cargaAFD()
+                elif opcion == 2:
+                    self.informacionAutomata()
+                elif opcion == 3:
+                    self.clrscr()
+                    print('********* Validar una cadena *********\n')
+                    resultados = []
+                    resultados = self.validarCadenaAFD()
+                    if resultados[0] == True:
+                        input('¡CADENA VALIDA!\nPrsione ENTER para volver al menú principal.')
+                    else:
+                        input('¡CADENA INVALIDA!\nPrsione ENTER para volver al menú principal.')
+                elif opcion == 4:
+                    self.clrscr()
+                    print('********* Ruta de validación *********\n')
+                    resultados = []
+                    resultados = self.validarCadenaAFD()
+                    if resultados[0] == True:
+                        print('¡CADENA VALIDA!')
+                        for u in range(len(resultados[1])):
+                            print(resultados[1][u])
+                        input('Prsione ENTER para volver al menú principal.')
+                    else:                    
+                        input('¡CADENA INVALIDA!\nPrsione ENTER para volver al menú principal.')
+                elif opcion == 5:
+                    self.recorridoApaso()
+                elif opcion == 6:
+                    self.validarPasada()
+                elif opcion == 7:
+                    salida3 = False
+        except:
+            self.ModuloAutomatas()
     
     def cargaAFD(self):
-        self.clrscr()
-        nombre = input("Ingrese el nombre del archivo para generar el/los AP/s: ")
-        archivoAFDS = open(nombre,'r') 
-        Datos = archivoAFDS.read()
-        archivoAFDS.close()
-        divisonAFDS = Datos.split('%')
         try:
-            divisonAFDS.remove('')
-        except:
-            pass
-        listaAutomatas = []
-        #ciclo for para extraer los datos de cada automata, 
-        # ponerlos en una lista de listas y eliminar elementos en blanco
-        for a in range(len(divisonAFDS)):
-            automata = divisonAFDS[a].split('\n')
+            self.clrscr()
+            nombre = input("Ingrese el nombre del archivo para generar el/los AP/s: ")
+            archivoAFDS = open(nombre,'r') 
+            Datos = archivoAFDS.read()
+            archivoAFDS.close()
+            divisonAFDS = Datos.split('%')
             try:
-                automata.remove('')
-                automata.remove('')
+                divisonAFDS.remove('')
             except:
                 pass
-            listaAutomatas.append(automata)
-        #Ciclo for para empezar a crear objetos Aefede
-        for i in range(len(listaAutomatas)):
-            try:
-                #verificando si el automata que se quiere agregar ya existe
-                flag = 0
-                for z in range(len(self.automatas)):
-                    if listaAutomatas[i][0] == self.automatas[z].getName():
-                        flag +=1
-                if flag == 0: #el automata no existe y lo agregamos
-                    #tratamos con el nombre
-                    name = str(listaAutomatas[i][0])
-                    aefede = Aefede(name)
-                    self.automatas.append(aefede)
-                    #tratamos con el alfabeto
-                    alpha = listaAutomatas[i][1].split(',')
-                    for k in range(len(alpha)):
-                        self.CrearAlfabeto(name,str(alpha[k]))
-                    #tratamos con los simbolos de pila
-                    simPila = listaAutomatas[i][2].split(',')
-                    for k in range(len(simPila)):
-                        self.CrearSimPila(name,str(simPila[k]))
-                    #tratamos con los estados
-                    estrato = listaAutomatas[i][3].split(',')
-                    for j in range(len(estrato)):
-                        self.CrearEstados(name,str(estrato[j]))                    
-                    #tratamos con el estado inicial
-                    self.AsignarEstadoInicial(name,str(listaAutomatas[i][4]))
-                    #tratamos con los estados de aceptacion
-                    try:
-                        aceptaciones = listaAutomatas[i][5].split(',')
-                        aceptaciones.remove('')
-                    except:
-                        pass
-                    for l in range(len(aceptaciones)):
-                        self.Acetona(name,str(aceptaciones[l]))
-                    #Tratamos con las transiciones
-                    for m in range(len(listaAutomatas[i])):
-                        if m >=6:
-                            self.Transiciones(name,str(listaAutomatas[i][m]))
-                    print("AP cargado correctamente.")
-                    time.sleep(1.3)
+            listaAutomatas = []
+            #ciclo for para extraer los datos de cada automata, 
+            # ponerlos en una lista de listas y eliminar elementos en blanco
+            for a in range(len(divisonAFDS)):
+                automata = divisonAFDS[a].split('\n')
+                try:
+                    automata.remove('')
+                    automata.remove('')
+                except:
+                    pass
+                listaAutomatas.append(automata)
+            #Ciclo for para empezar a crear objetos Aefede
+            for i in range(len(listaAutomatas)):
+                try:
+                    #verificando si el automata que se quiere agregar ya existe
+                    flag = 0
+                    for z in range(len(self.automatas)):
+                        if listaAutomatas[i][0] == self.automatas[z].getName():
+                            flag +=1
+                    if flag == 0: #el automata no existe y lo agregamos
+                        #tratamos con el nombre
+                        name = str(listaAutomatas[i][0])
+                        aefede = Aefede(name)
+                        self.automatas.append(aefede)
+                        #tratamos con el alfabeto
+                        alpha = listaAutomatas[i][1].split(',')
+                        for k in range(len(alpha)):
+                            self.CrearAlfabeto(name,str(alpha[k]))
+                        #tratamos con los simbolos de pila
+                        simPila = listaAutomatas[i][2].split(',')
+                        for k in range(len(simPila)):
+                            self.CrearSimPila(name,str(simPila[k]))
+                        #tratamos con los estados
+                        estrato = listaAutomatas[i][3].split(',')
+                        for j in range(len(estrato)):
+                            self.CrearEstados(name,str(estrato[j]))                    
+                        #tratamos con el estado inicial
+                        self.AsignarEstadoInicial(name,str(listaAutomatas[i][4]))
+                        #tratamos con los estados de aceptacion
+                        try:
+                            aceptaciones = listaAutomatas[i][5].split(',')
+                            aceptaciones.remove('')
+                        except:
+                            pass
+                        for l in range(len(aceptaciones)):
+                            self.Acetona(name,str(aceptaciones[l]))
+                        #Tratamos con las transiciones
+                        for m in range(len(listaAutomatas[i])):
+                            if m >=6:
+                                self.Transiciones(name,str(listaAutomatas[i][m]))
+                        print("AP cargado correctamente.")
+                        time.sleep(1.3)
 
-                else:
-                    print("El AP que se quiere agregar ya existe en memoria")
-                    time.sleep(0.5)
-            except:
-                pass
+                    else:
+                        print("El AP que se quiere agregar ya existe en memoria")
+                        time.sleep(0.5)
+                except:
+                    pass
+        except:
+            input("El archivo que se quiere cargar no cuenta con la estructura que demanda el programa")
     
     def CrearEstados(self, nome, estado):
         state = Estado(estado)
@@ -579,7 +600,7 @@ class SparkStack(object):
                     else:
                         self.automatas[a].getAlfabeto().append(alfa)
                 else:
-                    input("El caracter que se quiere agregar como alfabeto ya está como un estado.\nNo se puede realizar la operacion.")
+                    print("El caracter que se quiere agregar como alfabeto ya está como un estado.\nNo se puede realizar la operacion.")
 
     def CrearSimPila(self, nome, alfa):
         for a in range(len(self.automatas)):
@@ -604,7 +625,7 @@ class SparkStack(object):
                     else:
                         self.automatas[a].getSimbolosPila().append(alfa)
                 else:
-                    input("El caracter que se quiere agregar como alfabeto ya está como un estado.\nNo se puede realizar la operacion.")
+                    print("El caracter que se quiere agregar como alfabeto ya está como un estado.\nNo se puede realizar la operacion.")
 
     def AsignarEstadoInicial(self, nome, dato):
         flag = 0
@@ -617,7 +638,7 @@ class SparkStack(object):
                             flag+=1
                             self.automatas[i].getEstados()[b].setInicio(True)                    
                 else:
-                    input("El AP al que intenta asignar un estado inicial no cuenta con ningun estado todavia.")                    
+                    print("El AP al que intenta asignar un estado inicial no cuenta con ningun estado todavia.")                    
 
     def Acetona(self,nome,dato):
         for i in range(len(self.automatas)):
@@ -652,27 +673,12 @@ class SparkStack(object):
                             flag3+=1
                                     #input("terminal")
 
-                    #validando estado inicial y que no haya mas de una transición con la misma terminal
-                    #validando estado final
+                    #validando estado inicial                     
                     for b in range(len(self.automatas[i].getEstados())):
                         if parte1[0]== self.automatas[i].getEstados()[b].getNameE():
                             flag1+=1
-                            inicial = self.automatas[i].getEstados()[b]
-                    #
-                    """ for a in range(len(self.automatas[i].getEstados())):
-                        if parte1[0] == self.automatas[i].getEstados()[a].getNameE():
-                            flag1+=1
-                            inicial = self.automatas[i].getEstados()[a]
-                            if self.automatas[i].getEstados()[a].getSalidas():
-
-                                for k in range(len(self.automatas[i].getEstados()[a].getSalidas())):
-                                    if parte1[1]==self.automatas[i].getEstados()[a].getSalidas()[k]:
-                                        banderita+=1                                        
-                                if banderita == 0:
-                                    self.automatas[i].getEstados()[a].getSalidas().append(parte1[1])
-                            else:
-                                self.automatas[i].getEstados()[a].getSalidas().append(parte1[1]) """
-                                    #input("inicio")
+                            inicial = self.automatas[i].getEstados()[b]                    
+                                    
                     #validando estado final
                     for b in range(len(self.automatas[i].getEstados())):
                         if parte2[0]== self.automatas[i].getEstados()[b].getNameE():
@@ -724,7 +730,7 @@ class SparkStack(object):
                         alfa+=", "+self.automatas[a].getSimbolosPila()[i]
                     else:
                         alfa+=self.automatas[a].getSimbolosPila()[i]
-                c.drawString(75,685,"Alfabeto: "+alfa)
+                c.drawString(75,685,"Alfabeto de pila: "+alfa)
                     #estados
                 estadio=""
                 for j in range(len(self.automatas[a].getEstados())):
