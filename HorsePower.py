@@ -38,7 +38,7 @@ class SparkStack(object):
             print("Desarrollador: Luis Amilcar Morales Xón \nCarnet: 201701059")
             print("-------------------------------------> " + str(a*20)+"%")
             print("Tiempo restante para la ejecución del programa: "+str(5-a))
-            time.sleep(0.1)
+            time.sleep(1)
             self.clrscr()
         self.Menu() 
 
@@ -224,14 +224,14 @@ class SparkStack(object):
                         esTipo3 = self.gramaticas[q].getTipo3()
                         if esTipo3 == True:
                             print("Gramatica agregada con éxito.\n")
-                            #time.sleep(2)
+                            time.sleep(1.3)
                         else:
                             self.gramaticas.pop(q)
                             print("Es gramatica regular. SE DESCARTA.\n")
-                            #time.sleep(2)
+                            time.sleep(1.3)
             else: #se repite
                 print("Aviso: Se encontró una gramatica con el mismo nombre en memoria, la accion no se puede completar.")
-                time.sleep(2)
+                time.sleep(1.3)
 
     def listarGramaticas(self):        
         for a in range(len(self.gramaticas)):
@@ -458,8 +458,7 @@ class SparkStack(object):
                 else:                    
                     input('¡CADENA INVALIDA!\nPrsione ENTER para volver al menú principal.')
             elif opcion == 5:
-                print("recorrido paso a paso")
-                time.sleep(1)
+                self.recorridoApaso()
             elif opcion == 6:
                 self.validarPasada()
             elif opcion == 7:
@@ -527,7 +526,7 @@ class SparkStack(object):
                         if m >=6:
                             self.Transiciones(name,str(listaAutomatas[i][m]))
                     print("AP cargado correctamente.")
-                    time.sleep(0.5)
+                    time.sleep(1.3)
 
                 else:
                     print("El AP que se quiere agregar ya existe en memoria")
@@ -867,6 +866,144 @@ class SparkStack(object):
                 self.automatas[i].setPila(nuevaPila)
         return aceptamos, ruta
     
+    def recorridoApaso(self):
+        self.clrscr()
+        entrada =""
+        aceptamos = False
+        ruta = []
+        bandera = 0        
+        final = ""
+        banderazo = 0
+        name = self.listarAP()
+        for i in range(len(self.automatas)):
+            if name == self.automatas[i].getName():
+                cadena ="#"
+                cadena += input("Ingrese la cadena a evaluar: ")                
+                cadena+='#'                
+                #for para la cadena ingresada
+                for a in range(cadena.__len__()):
+                    #print("empezamos con el for de la cadena")
+                    #for para recorrer las transiciones del automata
+                    for b in range(len(self.automatas[i].getTransiciones())):
+                        #print("empezamos con el for de las transiciones")
+                        if bandera == 0:
+                            if self.automatas[i].getTransiciones()[b].geteInicial().getInicio()==True:
+                                #print("reconozco el inicio")
+                                bandera+=1                                                                
+                                final = self.automatas[i].getTransiciones()[b].geteFinal().getNameE()
+                                transicion = self.automatas[i].getTransiciones()[b].geteInicial().getNameE()+","+self.automatas[i].getTransiciones()[b].getLeer()+","+self.automatas[i].getTransiciones()[b].getSacar()+";"+self.automatas[i].getTransiciones()[b].geteFinal().getNameE()+","+self.automatas[i].getTransiciones()[b].getGuardar()
+                                if self.automatas[i].getTransiciones()[b].getGuardar() != '$':
+                                    self.automatas[i].getPila().append(self.automatas[i].getTransiciones()[b].getGuardar())
+                                ruta.append(transicion)
+                                self.generarGrafo(name,self.automatas[i].getTransiciones()[b].geteInicial().getNameE(),self.automatas[i].getTransiciones()[b].geteFinal().getNameE(),a,str(self.automatas[i].getPila()),entrada)
+                                input('Presione enter para postrar la siguiente imagen.')
+                                break
+                                #print("aceptacion transicion 1" + str(self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()))
+                                #input("pasa en el inicial")                            
+                        else:
+                            if final == self.automatas[i].getTransiciones()[b].geteInicial().getNameE():
+                                if cadena[a]==self.automatas[i].getTransiciones()[b].getLeer():
+                                    entrada+=cadena[a]
+                                    #print("reconozco las demas transiciones")
+                                    #aceptamos = self.automatas[i].getTransiciones()[b].geteFinal().getAcepta()
+                                    final = self.automatas[i].getTransiciones()[b].geteFinal().getNameE()
+                                    transicion = self.automatas[i].getTransiciones()[b].geteInicial().getNameE()+","+self.automatas[i].getTransiciones()[b].getLeer()+","+self.automatas[i].getTransiciones()[b].getSacar()+";"+self.automatas[i].getTransiciones()[b].geteFinal().getNameE()+","+self.automatas[i].getTransiciones()[b].getGuardar()
+                                    ruta.append(transicion)
+                                    #print(self.automatas[i].getPila())
+                                    if self.automatas[i].getTransiciones()[b].getGuardar() != '$':
+                                        self.automatas[i].getPila().append(self.automatas[i].getTransiciones()[b].getGuardar())
+                                    if self.automatas[i].getTransiciones()[b].getSacar() != '$':
+                                        try:
+                                            self.automatas[i].getPila().remove(self.automatas[i].getTransiciones()[b].getSacar())
+                                        except:
+                                            pass
+                                            #input("algo salió mal")
+                                            banderazo+=1
+                                    self.generarGrafo(name,self.automatas[i].getTransiciones()[b].geteInicial().getNameE(),self.automatas[i].getTransiciones()[b].geteFinal().getNameE(),a,str(self.automatas[i].getPila()),entrada)
+                                    input('Presione enter para postrar la siguiente imagen.')
+                                    break
+                                #print("aceptacion transicion " + str(b+1) + str(self.boveda[i].getTransiciones()[b].geteFinal().getAcepta()))
+                                #input("pasa en los demas transiciones")  
+                                if cadena[a]=='#' and self.automatas[i].getTransiciones()[b].getLeer() =='$':
+                                    #print("reconozco el final")
+                                    #aceptamos = self.automatas[i].getTransiciones()[b].geteFinal().getAcepta()                                    
+                                    transicion = self.automatas[i].getTransiciones()[b].geteInicial().getNameE()+","+self.automatas[i].getTransiciones()[b].getLeer()+","+self.automatas[i].getTransiciones()[b].getSacar()+";"+self.automatas[i].getTransiciones()[b].geteFinal().getNameE()+","+self.automatas[i].getTransiciones()[b].getGuardar()
+                                    ruta.append(transicion)
+                                    if self.automatas[i].getTransiciones()[b].getGuardar() != '$':
+                                        self.automatas[i].getPila().append(self.automatas[i].getTransiciones()[b].getGuardar())
+                                    if self.automatas[i].getTransiciones()[b].getSacar() != '$':
+                                        #print('tengo que eliminar')
+                                        try:    
+                                            self.automatas[i].getPila().remove(self.automatas[i].getTransiciones()[b].getSacar())
+                                        except:
+                                            pass
+                                        self.generarGrafo(name,self.automatas[i].getTransiciones()[b].geteInicial().getNameE(),self.automatas[i].getTransiciones()[b].geteFinal().getNameE(),a,str(self.automatas[i].getPila()),entrada)
+                                        input('Presione enter para postrar la siguiente imagen.')
+                                    break
+                #print(self.automatas[i].getPila())
+                if len(self.automatas[i].getPila())==0 and banderazo == 0: 
+                    aceptamos = True
+                nuevaPila = []
+                pilaa = ""
+                pilaa = str(self.automatas[i].getPila())+"\n"
+                self.automatas[i].setPila(nuevaPila)
+                for i in range(len(self.automatas)):
+                    if name == self.automatas[i].getName():
+                        f = Digraph(filename = 'Fin', format='png', encoding='UTF-8')
+                        f.attr(rankdir = 'LR')                
+                        for a in range(len(self.automatas[i].getEstados())):
+                            if self.automatas[i].getEstados()[a].getAcepta()==False:                                                        
+                                f.attr('node',shape = 'circle',style='filled', color='grey')
+                                f.node(self.automatas[i].getEstados()[a].getNameE())
+                            else:                                
+                                f.attr('node', shape = 'doublecircle', style='filled', color='gold')
+                                f.node(self.automatas[i].getEstados()[a].getNameE())
+
+                        for k in range(len(self.automatas[i].getTransiciones())):                            
+                            transicion = self.automatas[i].getTransiciones()[k].getLeer()+","+self.automatas[i].getTransiciones()[k].getSacar()+";"+self.automatas[i].getTransiciones()[k].getGuardar()
+                            f.edge(self.automatas[i].getTransiciones()[k].geteInicial().getNameE(),self.automatas[i].getTransiciones()[k].geteFinal().getNameE(), label=transicion)
+                        if aceptamos==True:
+                            pilaa +="Cadena valida"
+                            f.attr(label = pilaa)
+                        else:
+                            pilaa+="Cadena invalida"
+                            f.attr(label =pilaa)
+                        f.view()
+
+    def generarGrafo(self, name, inicio, final,indice, pila, entrada):
+        for i in range(len(self.automatas)):
+            if name == self.automatas[i].getName():
+                f = Digraph(filename = str(indice), format='png', encoding='UTF-8')
+                f.attr(rankdir = 'LR')                
+                texto=""
+                texto+="Pila: "+pila+"\n"
+                texto+="Entrada: "+entrada+"\n"
+                f.attr(label=texto)
+                for a in range(len(self.automatas[i].getEstados())):
+                    if self.automatas[i].getEstados()[a].getAcepta()==False:                        
+                        if inicio == self.automatas[i].getEstados()[a].getNameE():
+                            f.attr('node',shape = 'circle', style='filled', color='gold')
+                            f.node(self.automatas[i].getEstados()[a].getNameE())
+                        else:
+                            f.attr('node',shape = 'circle',style='filled', color='grey')
+                            f.node(self.automatas[i].getEstados()[a].getNameE())
+                    else:
+                        if inicio == self.automatas[i].getEstados()[a].getNameE():
+                            f.attr('node', shape = 'doublecircle',style='filled', color='gold')
+                            f.node(self.automatas[i].getEstados()[a].getNameE())
+                        else:
+                            f.attr('node', shape = 'doublecircle', style='filled', color='grey')
+                            f.node(self.automatas[i].getEstados()[a].getNameE())
+
+                for k in range(len(self.automatas[i].getTransiciones())):
+                    if inicio == self.automatas[i].getTransiciones()[k].geteInicial().getNameE() and final == self.automatas[i].getTransiciones()[k].geteFinal().getNameE():                        
+                        transicion = self.automatas[i].getTransiciones()[k].getLeer()+","+self.automatas[i].getTransiciones()[k].getSacar()+";"+self.automatas[i].getTransiciones()[k].getGuardar()
+                        f.edge(self.automatas[i].getTransiciones()[k].geteInicial().getNameE(),self.automatas[i].getTransiciones()[k].geteFinal().getNameE(), label=transicion, color = 'red')
+                    else:
+                        transicion = self.automatas[i].getTransiciones()[k].getLeer()+","+self.automatas[i].getTransiciones()[k].getSacar()+";"+self.automatas[i].getTransiciones()[k].getGuardar()
+                        f.edge(self.automatas[i].getTransiciones()[k].geteInicial().getNameE(),self.automatas[i].getTransiciones()[k].geteFinal().getNameE(), label=transicion)
+                f.view()
+
     def validarPasada(self):        
         self.clrscr()
         print("****** Validar cadena de una pasada ******")
@@ -974,5 +1111,5 @@ class SparkStack(object):
                 c.drawImage(pato,110,440)
                 c.save()
                 os.system(nombre)
-                input("perate")
+                #input("perate")
                 
