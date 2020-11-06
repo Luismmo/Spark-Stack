@@ -40,7 +40,7 @@ class SparkStack(object):
             print("Tiempo restante para la ejecución del programa: "+str(5-a))
             time.sleep(1)
             self.clrscr()
-            self.Menu()         
+        self.Menu()         
 
     def Menu(self):
         try:
@@ -420,15 +420,15 @@ class SparkStack(object):
                 f.attr('node', shape='doublecircle')
                 f.node("4","f")
                 f.edge('0','1')
-                f.edge('1','2', label='$,$;#')
-                f.edge('2','3', label='$,$;S')
+                f.edge('1','2', label='λ,λ;#')
+                f.edge('2','3', label='λ,λ;S')
                 transiciones = ""
                 for a in range(len(self.gramaticas[i].getTerminales())):
-                    transiciones+=self.gramaticas[i].getTerminales()[a]+","+self.gramaticas[i].getTerminales()[a]+";$\n"
+                    transiciones+=self.gramaticas[i].getTerminales()[a]+","+self.gramaticas[i].getTerminales()[a]+";λ\n"
                 for k in range(len(self.gramaticas[i].getProducciones())):
-                    transiciones+="$,"+self.gramaticas[i].getProducciones()[k].gettInicial()+";"+self.gramaticas[i].getProducciones()[k].getDerivacion()+"\n"
+                    transiciones+="λ,"+self.gramaticas[i].getProducciones()[k].gettInicial()+";"+self.gramaticas[i].getProducciones()[k].getDerivacion()+"\n"
                 f.edge('3','3',label=transiciones)
-                f.edge('3','4',label='$,#;$')
+                f.edge('3','4',label='λ,#;λ')
                 f.view()
     
     #*********************************************

@@ -1,9 +1,8 @@
-Selvin
-X,Y
-a,b
-X
-X>a X d
-X>Y
-X>a
-Y>b Y c
+Tarea2
+X0,X1
+a,b,c
+X0
+X0>a X0 c c
+X0>b X1 c
+X1>b X1 c
 %
